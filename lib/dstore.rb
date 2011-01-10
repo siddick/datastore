@@ -1,16 +1,20 @@
 require 'yaml'
 
 module Dstore
-  # Your code goes here...
   class DB
     def initialize( config )
       @config = { :database => 'databases.yml', :index => 'indexs.yml', :namespace => 'dev' }.merge( config )
       if( @config[:database] and File.exist? @config[:database] )
-        @tables = YAML.load( @config[:database] )
+        @tables = YAML.load( File.open( @config[:database], "r" ) )
       else
         @tables = {}
       end
       @indexs = {}
+    end
+
+    def create_table( tname, fields )
+      @tables[tname] = fields
+      save_schema
     end
 
     def save_schema
@@ -25,7 +29,7 @@ module Dstore
 
     def columns( table_name, name = nil )
       if tables[table_name]
-        tables[table_name].columns
+        tables[table_name]
       end
     end
 
@@ -40,8 +44,8 @@ module Dstore
       column_list = columns( t_name )  
       q.fetch(options).each{|e| 
         h = {}
-        column_list.each{|c|
-          h[c.name.to_s] = ( c.name == p_key ? e.key.id : e[c.name] )
+        column_list.each{|n,opt|
+          h[n] = ( n == p_key ? e.key.id : e[n] )
         }
         output.push( h )
       }
@@ -55,17 +59,21 @@ module Dstore
 
     def update_query( q, values = nil )
       if( values and values.size > 0 )
-        q.each{|e| 
+        entities = []
+        q.each{|e|
           values.each{|k,v| e[k] = v }
-          AppEngine::Datastore.put e
+          entities.push( e )
         }
+        AppEngine::Datastore.put entities 
       end
     end
 
     def delete_query( q )
+      keys = []
       q.each{|e| 
-        AppEngine::Datastore.delete e.key
+        keys.push e.key 
       }
+      AppEngine::Datastore.delete keys
     end
 
   end

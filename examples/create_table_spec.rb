@@ -7,7 +7,10 @@ require 'logger'
 ActiveRecord::Base.logger = Logger.new( STDERR )
 
 class Person < ActiveRecord::Base
-  establish_connection :adapter => 'dstore', :database => 'database.yml', :index => 'indexs.yml'
+  establish_connection :adapter => 'datastore', :database => 'database.yml', :index => 'indexs.yml'
+
+  has_many :person_roles
+  has_many :roles, :through => :person_roles
 
   connection.create_table table_name, :force => true do |t|
     t.string :name
@@ -15,13 +18,41 @@ class Person < ActiveRecord::Base
   end
 end
 
+class Role < ActiveRecord::Base
+  establish_connection :adapter => 'datastore', :database => 'database.yml', :index => 'indexs.yml'
+  has_many :person_roles
+  has_many :people, :through => :person_roles
+
+  connection.create_table table_name, :force => true do |t|
+    t.string :name
+  end
+end
+
+class PersonRole < ActiveRecord::Base
+  establish_connection :adapter => 'datastore', :database => 'database.yml', :index => 'indexs.yml'
+  belongs_to :person
+  belongs_to :role
+
+
+  connection.create_table table_name, :force => true do |t|
+    t.integer :person_id
+    t.integer :role_id
+  end
+end
+
+
+
+
+
 p =  Person.find_by_name_and_description("gold", "nothing")
 puts p.inspect
 
-if p 
-  p.name = "happy"
-  p.save
-end
+
+
+#if p 
+#  p.name = "happy"
+#  p.save
+#end
 
 #puts Person.where( :id => [ 16, 14 ] ).inspect
 # bob = Person.create!(:name => 'gold', :description => "nothing")

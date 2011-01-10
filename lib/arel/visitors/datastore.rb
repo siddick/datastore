@@ -5,7 +5,7 @@ require 'appengine-apis/datastore'
 
 module Arel
   module Visitors
-    class Dstore < Arel::Visitors::ToSql
+    class Datastore < Arel::Visitors::ToSql
 
       class QString
         attr :q 
@@ -73,4 +73,4 @@ module Arel
   end
 end
 
-Arel::Visitors::VISITORS['dstore'] = Arel::Visitors::Dstore
+Arel::Visitors::VISITORS['datastore'] = Arel::Visitors::Datastore

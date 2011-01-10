@@ -4,18 +4,18 @@ require 'active_support/core_ext/object/blank'
 require 'set'
 
 require 'dstore'
-require 'arel/visitors/dstore'
+require 'arel/visitors/datastore'
 
 module ActiveRecord
   class Base
-    def self.dstore_connection(config) # :nodoc:
-      ConnectionAdapters::DstoreAdapter.new( Dstore::DB.new( config.symbolize_keys ), logger )
+    def self.datastore_connection(config) # :nodoc:
+      ConnectionAdapters::DatastoreAdapter.new( Dstore::DB.new( config.symbolize_keys ), logger )
     end
   end
 
   module ConnectionAdapters
-    class DstoreAdapter < AbstractAdapter
-      ADAPTER_NAME = "Dstore"
+    class DatastoreAdapter < AbstractAdapter
+      ADAPTER_NAME = "Datastore"
 
       def adapter_name #:nodoc:
         ADAPTER_NAME
@@ -82,14 +82,16 @@ module ActiveRecord
       end
 
       def create_table( table_name, options = {} )
-        log( "CREATE TABLE #{table_name}", "Dstore Adapter" ) {
+        log( "CREATE TABLE #{table_name}", "Datastore Adapter" ) {
           td = TableDefinition.new(self)
           td.primary_key(options[:primary_key] || Base.get_primary_key(table_name.to_s.singularize)) unless options[:id] == false
 
           yield td if block_given?
 
-          @connection.tables[table_name] = td 
-          @connection.save_schema
+          fields = {}
+          td.columns.each{|c| fields[c.name.to_s] = { :default => c.default, :type => c.type, :null => c.null } }
+          @connection.create_table( table_name, fields )
+          td
         }
       end
 
@@ -98,8 +100,8 @@ module ActiveRecord
       end
 
       def columns( table_name, name = nil)
-        @connection.columns( table_name, name ).collect{|c|
-          Column.new( c.name.to_s, c.default, c.type == :primary_key ? "integer" : c.type, c.null )
+        @connection.columns( table_name, name ).collect{|k,opt|
+          Column.new( k, opt[:default], opt[:type] == :primary_key ? "integer" : opt[:type], opt[:null] )
         } 
       end
       

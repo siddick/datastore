@@ -8,11 +8,13 @@ module Arel
     class Datastore < Arel::Visitors::ToSql
 
       class QString
+        attr :kind
         attr :q 
         attr :options
 
-        def initialize( q, options = {} )
-          @q = q
+        def initialize( kind, options = {} )
+          @kind = kind
+          @q = AppEngine::Datastore::Query.new( kind )
           @options = options
         end
 
@@ -25,17 +27,28 @@ module Arel
 
         alias :inspect :to_s
 
-        def self.generate( kind, wheres, options = {} )
-          q = AppEngine::Datastore::Query.new( kind )
+        def projections( projs )
+          projs.each{|p|
+            if( p.is_a? Arel::Nodes::Count )
+              options[:count] = true
+            end
+          }
+          self
+        end
+
+        def where( wheres )
           wheres.each{|w|
             w_expr  = w.expr
-            STDERR.puts "Where Expression: #{w_expr.inspect}(#{w_expr.class.inspect})"
             if( w_expr.class != Arel::Nodes::SqlLiteral )
-              key     = w_expr.left.name
+              key     = w_expr.left.name == :id ? :__key__ : w_expr.left.name
               val     = w_expr.right
               opt     = val.class == Array ? :in : w_expr.operator
-              if( key == :id )
-                key = :__key__
+              if( opt == :in and val.empty? )
+                options[:empty] = true 
+                val = [ "EMPTY" ]
+              end
+
+              if( key == :__key__ )
                 if opt == :in
                   val = val.collect{|v| AppEngine::Datastore::Key.from_path( kind, v ) } 
                 else
@@ -45,14 +58,13 @@ module Arel
               q.filter( key, opt, val )
             end
           }
-          self.new( q, options )
+          self
         end
-
       end
 
       def visit_Arel_Nodes_SelectStatement o
         c    = o.cores.first
-        QString.generate( c.froms.name, c.wheres, { :limit => o.limit, :offset => o.offset } )
+        QString.new( c.froms.name, { :limit => o.limit, :offset => o.offset } ).where( c.wheres ).projections( c.projections )
       end
 
       def visit_Arel_Nodes_InsertStatement o
@@ -62,11 +74,11 @@ module Arel
       end
 
       def visit_Arel_Nodes_UpdateStatement o
-        QString.generate( o.relation.name, o.wheres, :values => o.values.collect{|v| [ v.left.name, v.right ] } )
+        QString.new( o.relation.name, :values => o.values.collect{|v| [ v.left.name, v.right ] } ).where( o.wheres )
       end
 
       def visit_Arel_Nodes_DeleteStatement o
-        QString.generate( o.relation.name, o.wheres )
+        QString.new( o.relation.name ).where( o.wheres )
       end
 
     end

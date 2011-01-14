@@ -38,26 +38,18 @@ class PersonRole < ActiveRecord::Base
     t.integer :person_id
     t.integer :role_id
   end
+
+  connection.add_index table_name, [ :person_id, :role_id ]
 end
 
 
 
 
 
-p =  Person.find_by_name_and_description("gold", "nothing")
-puts p.inspect
+Person.create!( :name => "guest", :description => "for example" )
 
+p = Person.where( :name => "guest" , :description => "for example" ).first
+p = Person.find_by_name_and_description( "guest" , "for example" )
 
-
-#if p 
-#  p.name = "happy"
-#  p.save
-#end
-
-#puts Person.where( :id => [ 16, 14 ] ).inspect
-# bob = Person.create!(:name => 'gold', :description => "nothing")
-#puts Person.inspect
-#puts Person.all.inspect
-#bob.destroy
-#puts Person.all.inspect
-
+p.roles.build( :name => "guest" )
+p.save

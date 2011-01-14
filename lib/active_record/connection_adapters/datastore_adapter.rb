@@ -89,10 +89,32 @@ module ActiveRecord
           yield td if block_given?
 
           fields = {}
-          td.columns.each{|c| fields[c.name.to_s] = { :default => c.default, :type => c.type.to_s, :null => c.null } }
+          td.columns.each{|c| fields[c.name.to_s] = { "default" => c.default, "type" => c.type.to_s, "null" => c.null } }
           @connection.create_table( table_name, fields )
           td
         }
+      end
+
+      def drop_table( tname, options = {} )
+        @connection.drop_table( tname )
+      end
+
+      def rename_table( tname, ntname )
+        @connection.drop_table( tname, ntname )
+      end
+
+      def add_column(table_name, column_name, type, options = {})
+        @connection.add_column( table_name, column_name, type, options )
+      end
+
+      alias :change_column :add_column
+
+      def add_index(table_name, column_name, options = {})
+        @connection.add_index( table_name, column_name, options )
+      end
+
+      def remove_index(table_name, column_name )
+        @connection.remove_index( table_name, column_name )
       end
 
       def tables
@@ -101,7 +123,7 @@ module ActiveRecord
 
       def columns( table_name, name = nil)
         @connection.columns( table_name, name ).collect{|k,opt|
-          Column.new( k, opt[:default], opt[:type] == :primary_key ? "integer" : opt[:type].to_s, opt[:null] )
+          Column.new( k, opt["default"], opt["type"] == "primary_key" ? "integer" : opt["type"].to_s, opt["null"] )
         } 
       end
       
@@ -145,7 +167,7 @@ module ActiveRecord
         end
 
         def add_column(table_name, column_name, type, options = {})
-          @tables[table_name][column_name] = { :type => type.to_s, :default => options[:default], :null => options[:null] }
+          @tables[table_name][column_name] = { "type" => type.to_s, "default" => options[:default], "null" => options[:null] }
           save_schema
         end
 
@@ -156,13 +178,14 @@ module ActiveRecord
           column_name = [ column_name ] unless column_name.is_a? Array
           column_name.map!{|c| c.to_s }
           inds = @indexes.find_all{|i| i["kind"] == table_name and i["properties"].map{|p| p["name"] } == column_name }
-          unless inds.empty?
+          if inds.empty?
             @indexes.push( { "kind" => table_name, "properties" => column_name.map{|c| { "name" => c } } } )
             save_indexes
           end
         end
 
         def remove_index(table_name, column_name )
+          table_name  = table_name.to_s
           column_name = column_name[:column] if column_name.is_a? Hash
           column_name = [ column_name ] unless column_name.is_a? Array
           column_name.map!{|c| c.to_s }

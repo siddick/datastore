@@ -50,9 +50,9 @@ module Arel
 
               if( key == :__key__ )
                 if opt == :in
-                  val = val.collect{|v| AppEngine::Datastore::Key.from_path( kind, v ) } 
+                  val = val.collect{|v| AppEngine::Datastore::Key.from_path( kind, v.to_i ) } 
                 else
-                  val =  AppEngine::Datastore::Key.from_path( kind, val )
+                  val =  AppEngine::Datastore::Key.from_path( kind, val.to_i )
                 end
               end
               q.filter( key, opt, val )
@@ -62,9 +62,16 @@ module Arel
         end
       end
 
+      def get_limit_and_offset( o )
+        options = {}
+        options[:limit]  = o.limit.expr if o.limit
+        options[:offset] = o.offset.expr if o.offset
+        options
+      end
+
       def visit_Arel_Nodes_SelectStatement o
         c    = o.cores.first
-        QString.new( c.froms.name, { :limit => o.limit, :offset => o.offset } ).where( c.wheres ).projections( c.projections )
+        QString.new( c.froms.name, get_limit_and_offset(o) ).where( c.wheres ).projections( c.projections )
       end
 
       def visit_Arel_Nodes_InsertStatement o

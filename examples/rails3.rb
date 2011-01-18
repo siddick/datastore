@@ -1,5 +1,3 @@
-# workaround <<-GEMFILE wanting to
-# execute the string subsitution
 
 remove_file 'Gemfile'
 create_file 'Gemfile' do

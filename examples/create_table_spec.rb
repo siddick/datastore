@@ -15,6 +15,7 @@ class Person < ActiveRecord::Base
   connection.create_table table_name, :force => true do |t|
     t.string :name
     t.string :description
+    t.data   :text
   end
 end
 
@@ -41,8 +42,6 @@ class PersonRole < ActiveRecord::Base
 
   connection.add_index table_name, [ :person_id, :role_id ]
 end
-
-
 
 
 

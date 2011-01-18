@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
     t.integer   :age
     t.datetime  :dob
     t.float     :score
+    f.text      :data
 
     t.timestamps
   end

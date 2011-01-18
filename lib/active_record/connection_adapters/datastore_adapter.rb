@@ -56,6 +56,10 @@ module ActiveRecord
         }
       end
 
+      def select_rows(sql, name = nil)
+        select(sql, name).map{|r| r.map{|k,v| v } }
+      end
+
       def insert(sql, name = nil, pk = nil, id_value = nil, sequence_name = nil)
         log( "Insert: " + sql.inspect, name ){
           @connection.insert_query( sql )

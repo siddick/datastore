@@ -60,6 +60,17 @@ module Arel
           }
           self
         end
+        def orders( ords )
+          ords.each{|o|
+            if( o.is_a? String )
+              key, dir, notuse = o.split
+            else
+              key, dir = o.expr, o.direction
+            end
+            q.sort( key, dir )
+          }
+          self
+        end
       end
 
       def get_limit_and_offset( o )
@@ -71,7 +82,7 @@ module Arel
 
       def visit_Arel_Nodes_SelectStatement o
         c    = o.cores.first
-        QString.new( c.froms.name, get_limit_and_offset(o) ).where( c.wheres ).projections( c.projections )
+        QString.new( c.froms.name, get_limit_and_offset(o) ).where( c.wheres ).orders(o.orders).projections( c.projections )
       end
 
       def visit_Arel_Nodes_InsertStatement o

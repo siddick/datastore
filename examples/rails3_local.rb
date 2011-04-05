@@ -7,7 +7,7 @@ disable_system_gems
 disable_rubygems
 bundle_path ".gems/bundler_gems"
 
-gem 'rails', '~> 3.0.3'
+gem 'rails', '~> 3.0.5'
 gem 'appengine-apis', '>= 0.0.22'
 
 GEMFILE

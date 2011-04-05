@@ -2,14 +2,13 @@ h1. Datastore Adapter
 
 ActiveRecord Adatper for AppEngine Datastore. The AppEngine Datastore is not a relational database system. So, this adapter only support some basic features. 
 
-h2. Installation
+h2. Installation( under-construction )
 
 Create Rails 3 application:
 
-  rails new app_name -m http://siddick.github.com/datastore/rails3.rb
-
-  appcfg.rb run bin/rails g scaffold post title:string content:text  
-  appcfg.rb run bin/rake db:migrate
+bc. rails new app_name -m http://siddick.github.com/datastore/rails3.rb
+appcfg.rb run bin/rails g scaffold post title:string content:text  
+appcfg.rb run bin/rake db:migrate
 
 Run the server:
 

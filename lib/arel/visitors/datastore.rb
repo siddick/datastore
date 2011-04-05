@@ -38,8 +38,8 @@ module Arel
           self
         end
 
-        def where( wheres )
-          wheres.each{|w|
+        def wheres( conditions )
+          conditions.each{|w|
             w_expr  = w.expr rescue w
             if( w_expr.class != Arel::Nodes::SqlLiteral )
               key     = w_expr.left.name
@@ -89,7 +89,6 @@ module Arel
         def parese_expression_string( query )
           datas = query.scan( RExpr ).collect{|a| a.find{|i| i } }
           datas.delete_if{|d| ExOptr.include?(d) }
-          puts "#{query.inspect}: #{datas.inspect}"
           while( datas.size >= 3 )
             key = datas.shift.sub(/^[^.]*\./,'').to_sym
             opt = datas.shift
@@ -121,7 +120,7 @@ module Arel
 
       def visit_Arel_Nodes_SelectStatement o
         c    = o.cores.first
-        QString.new( @connection, c.froms.name, get_limit_and_offset(o) ).where( c.wheres ).orders(o.orders).projections( c.projections )
+        QString.new( @connection, c.froms.name, get_limit_and_offset(o) ).wheres( c.wheres ).orders(o.orders).projections( c.projections )
       end
 
       def visit_Arel_Nodes_InsertStatement o
@@ -131,11 +130,11 @@ module Arel
       end
 
       def visit_Arel_Nodes_UpdateStatement o
-        QString.new( @connection, o.relation.name, :values => o.values.collect{|v| [ v.left.name, v.right ] } ).where( o.wheres )
+        QString.new( @connection, o.relation.name, :values => o.values.collect{|v| [ v.left.name, v.right ] } ).wheres( o.wheres )
       end
 
       def visit_Arel_Nodes_DeleteStatement o
-        QString.new( @connection, o.relation.name ).where( o.wheres )
+        QString.new( @connection, o.relation.name ).wheres( o.wheres )
       end
 
     end

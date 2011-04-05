@@ -36,23 +36,6 @@ module ActiveRecord
         true
       end
 
-      def native_database_types #:nodoc:
-        {
-          :primary_key => { :name => "integer", :primary_key => true },
-          :string      => { :name => "varchar", :limit => 255 },
-          :text        => { :name => "text" },
-          :integer     => { :name => "integer" },
-          :float       => { :name => "float" },
-          :decimal     => { :name => "decimal" },
-          :datetime    => { :name => "datetime" },
-          :timestamp   => { :name => "datetime" },
-          :time        => { :name => "time" },
-          :date        => { :name => "date" },
-          :binary      => { :name => "blob" },
-          :boolean     => { :name => "boolean" }
-        }
-      end
-
       def select( sql, name = nil, binds = [] )
         log( sql.inspect, name ) {
           @connection.select_query( sql.q, sql.options )
@@ -138,7 +121,10 @@ module ActiveRecord
       end
       
       def primary_key( table_name )
-        'id'
+        column = @connection.columns( table_name ).find{|k,opt|
+          opt["type"] == "primary_key"
+        }
+        column ? column[0] : nil
       end
 
       class DB

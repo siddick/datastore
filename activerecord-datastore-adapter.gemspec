@@ -9,7 +9,8 @@ Gem::Specification.new do |s|
   s.email       = ["siddick@gmail.com"]
   s.homepage    = "http://rubygems.org/gems/datastore"
   s.summary     = %q{ActiveRecord Adapter for Appengine Datastore}
-  s.description = %q{Just an ActiveRecord Adapter for the Appengine Datastore}
+  s.description = %q{Just an ActiveRecord Adapter for the Appengine Datastore. 
+    Create Rails3 application: rails new app_name -m http://siddick.github.com/datastore/rails3.rb}
 
   s.rubyforge_project = "activerecord-datastore-adapter"
 

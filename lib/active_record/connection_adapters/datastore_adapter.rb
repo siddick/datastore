@@ -130,7 +130,10 @@ module ActiveRecord
 
       def columns( table_name, name = nil)
         @connection.columns( table_name, name ).collect{|k,opt|
-          Column.new( k, opt["default"], opt["type"] == "primary_key" ? "integer" : opt["type"].to_s, opt["null"] )
+          is_primary = opt["type"] == "primary_key"
+          c = Column.new( k, opt["default"], is_primary ? "integer" : opt["type"].to_s, opt["null"] )
+          c.primary = true if is_primary
+          c
         } 
       end
       

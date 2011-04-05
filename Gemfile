@@ -4,4 +4,4 @@ source "http://rubygems.org"
 gemspec
 
 gem 'rspec'
-gem 'sqlite3-ruby'
+gem 'appengine-sdk', '1.4.0'

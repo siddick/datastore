@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency( 'appengine-apis', '>= 0.0.22' )
+  s.add_dependency( 'appengine-apis', '0.0.22' )
   s.add_dependency( 'activerecord', '>= 3.0.3' )
   s.add_dependency( 'arel', '>= 2.0.7' )
 end

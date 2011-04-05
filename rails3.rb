@@ -28,8 +28,8 @@ String.class_eval do
     end
   end
 end
-
 BOOT
+end
 
 
 remove_file 'config/database.yml'

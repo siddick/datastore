@@ -2,7 +2,7 @@ h1. Datastore Adapter
 
 ActiveRecord Adatper for AppEngine Datastore. The AppEngine Datastore is not a relational database system. So, this adapter only support some basic features. 
 
-h2. Installation( under-construction )
+h2. Installation
 
 Use appengine-sdk (1.4.0)
 

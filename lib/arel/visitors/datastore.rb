@@ -58,7 +58,9 @@ module Arel
           :integer     => lambda{|k,i| i.to_i },
           :datetime    => lambda{|k,t| t.is_a?(Time)? t : Time.parse(t.to_s) },
           :date        => lambda{|k,t| t.is_a?(Date)? t : Date.parse(t.to_s) },
-          :float       => lambda{|k,f| f.to_f }
+          :float       => lambda{|k,f| f.to_f },
+          :text        => lambda{|k,t| AppEngine::Datastore::Text.new(t) },
+          :binary      => lambda{|k,t| AppEngine::Datastore::Blob.new(t) }
         }
         InScan = /'((\\.|[^'])*)'|(\d+)/
         def apply_filter( key, opt, value )
@@ -123,9 +125,13 @@ module Arel
         QString.new( @connection, c.froms.name, get_limit_and_offset(o) ).wheres( c.wheres ).orders(o.orders).projections( c.projections )
       end
 
+      def insert_type_case( value )
+        value.is_a?( ActiveSupport::TimeWithZone ) ? value.time : value
+      end
+
       def visit_Arel_Nodes_InsertStatement o
         e = AppEngine::Datastore::Entity.new(o.relation.name)
-        o.columns.each_with_index{|c,i| e[c.name] = o.values.left[i] }
+        o.columns.each_with_index{|c,i| e[c.name] = insert_type_case(o.values.left[i]) }
         e
       end
 

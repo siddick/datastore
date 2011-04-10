@@ -7,29 +7,17 @@ disable_system_gems
 disable_rubygems
 bundle_path ".gems/bundler_gems"
 
-gem 'rails', '~> 3.0.5'
+gem 'rails', '3.0.5'
 gem 'activerecord-datastore-adapter'
 gem 'jruby-rack', '1.0.5'
 
 GEMFILE
 end
 
-remove_file 'config/boot.rb'
-create_file 'config/boot.rb' do
-<<-BOOT
+gsub_file 'config/boot.rb', /^/ do
+  "# "
+end
 
-String.class_eval do
-  alias :old_plus :+
-  def +( val )
-    if( val.is_a? Array )
-      [ self ] + val
-    else
-      old_plus val
-    end
-  end
-end
-BOOT
-end
 
 
 remove_file 'config/database.yml'
@@ -58,6 +46,22 @@ gsub_file 'config/application.rb', /class Application < Rails::Application$/ do
       require 'appengine-apis/logger'
       config.logger = AppEngine::Logger.new
   "
+end
+
+create_file 'config/initializers/rails_patch.rb' do
+<<-BOOT
+
+String.class_eval do
+  alias :old_plus :+
+  def +( val )
+    if( val.is_a? Array )
+      [ self ] + val
+    else
+      old_plus val
+    end
+  end
+end
+BOOT
 end
 
 create_file 'config/initializers/cache_store.rb' do

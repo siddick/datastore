@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "activerecord-datastore-adapter"
-  s.version     = "0.0.1"
+  s.version     = "0.0.3"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Mohammed Siddick"]
   s.email       = ["siddick@gmail.com"]
@@ -20,6 +20,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency( 'appengine-apis', '0.0.22' )
-  s.add_dependency( 'activerecord', '>= 3.0.3' )
+  s.add_dependency( 'activerecord', '3.0.6' )
   s.add_dependency( 'arel', '>= 2.0.7' )
 end

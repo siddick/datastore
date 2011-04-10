@@ -17,6 +17,13 @@ module ActiveRecord
   end
 
   module ConnectionAdapters
+
+    class DataStoreColumn < Column
+      def self.binary_to_string value
+        AppEngine::Datastore::Blob.new(value)
+      end
+    end
+
     class DatastoreAdapter < AbstractAdapter
       ADAPTER_NAME = "Datastore"
 
@@ -114,7 +121,7 @@ module ActiveRecord
       def columns( table_name, name = nil)
         @connection.columns( table_name, name ).collect{|k,opt|
           is_primary = opt["type"] == "primary_key"
-          c = Column.new( k, opt["default"], is_primary ? "integer" : opt["type"].to_s, opt["null"] )
+          c = DataStoreColumn.new( k, opt["default"], is_primary ? "integer" : opt["type"].to_s, opt["null"] )
           c.primary = true if is_primary
           c
         } 

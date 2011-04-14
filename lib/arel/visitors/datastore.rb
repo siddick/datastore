@@ -136,7 +136,7 @@ module Arel
       end
 
       def visit_Arel_Nodes_UpdateStatement o
-        QString.new( @connection, o.relation.name, :values => o.values.collect{|v| [ v.left.name, v.right ] } ).wheres( o.wheres )
+        QString.new( @connection, o.relation.name, :values => o.values.collect{|v| [ v.left.name, insert_type_case(v.right) ] } ).wheres( o.wheres )
       end
 
       def visit_Arel_Nodes_DeleteStatement o

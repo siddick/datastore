@@ -3,11 +3,11 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "activerecord-datastore-adapter"
-  s.version     = "0.0.3"
+  s.version     = "0.0.4"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Mohammed Siddick"]
   s.email       = ["siddick@gmail.com"]
-  s.homepage    = "http://rubygems.org/gems/datastore"
+  s.homepage    = "https://github.com/siddick/datastore"
   s.summary     = %q{ActiveRecord Adapter for Appengine Datastore}
   s.description = %q{Just an ActiveRecord Adapter for the Appengine Datastore. 
     Create Rails3 application: rails new app_name -m http://siddick.github.com/datastore/rails3.rb}
